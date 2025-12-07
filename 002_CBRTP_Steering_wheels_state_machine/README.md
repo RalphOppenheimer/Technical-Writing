@@ -72,17 +72,17 @@ Subdivision with respect to responsibilities of the states:
 
 ```mermaid
 sequenceDiagram
-    box rgb(227, 242, 253) [A] Inicjalizacja
+    box #0d47a1 [A] Inicjalizacja
     participant 0 as 0_NR
     end
     
-    box rgb(243, 229, 245) [B] Napęd
+    box #4a148c [B] Napęd
     participant 10 as 10_DW_S
     participant 11 as 11_DW_SP
     participant 12 as 12_DW_IP
     end
     
-    box rgb(200, 230, 201) [C1] Jednoczesny Ster
+    box #1b5e20 [C1] Jednoczesny Ster
     participant 1 as 1_SW_S
     participant 2 as 2_SW_SDR
     participant 3 as 3_SW_0
@@ -90,18 +90,18 @@ sequenceDiagram
     participant 5 as 5_SW_N90
     end
     
-    box rgb(165, 214, 167) [C2] Yaw Ster
+    box #33691e [C2] Yaw Ster
     participant 8 as 8_SW_Y
     participant 9 as 9_YAW_DR
     participant 6 as 6_SW_Y120
     participant 7 as 7_SW_YN120
     end
     
-    box rgb(232, 245, 233) [C3] Ster Ogólne
+    box #2e7d32 [C3] Ster Ogólne
     participant 13 as 13_WS
     end
     
-    box rgb(255, 235, 238) [D] Bezpieczeństwo
+    box #b71c1c [D] Bezpieczeństwo
     participant 14 as 14_WD
     participant 15 as 15_WE
     participant M as M
