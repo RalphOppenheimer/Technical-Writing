@@ -11,7 +11,7 @@ The red buttons are bistable, the green buttons - are monostable.
 
 Because the robot was a prototype in development, many of the functionalities described on the remote control are not reflecting their final purpose. 
 The image below shows naming convention used for the buttons and the joys as they are used in the state machine logic and diagram. **Not every button is mentioned in the diagram  - they are displayed in blue text** 
-![View of the remote control with descriptions used in state machine diagram](./assets/pulpit_z_piktogramami_.svg)
+![View of the remote control with descriptions used in state machine diagram](./assets/legend_IREL_remote.svg)
 
 
 ## Steering modes
