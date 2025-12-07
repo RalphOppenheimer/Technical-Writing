@@ -2,17 +2,19 @@
 This is a project of steering algorithm dedicated for a prototype of plastering robot created at CBRTP, 
 where I was responsible for development, testing and documenting the operational capabilities of the drivetrain.
 
-## 1. Introduction
+## Introduction
 The robot has a total of 4 wheels, each is driven by two motors - one responsible for driving, the second one - for steering. 
 The remote control device dedicated for steering is presented in the image below. 
 It has two joysticks - their respective purposes are described in chapter () and the functionalities of the buttons in chapter ().
 ![View of the remote control with initial descriptions in polish](./assets/pulpit_z_piktogramami_.svg)
 The red buttons are bistable, the green buttons - are monostable.
 
-Because the robot was a prototype in development, many of the functionalities described on the remote control are not reflecting their final purpose.
+Because the robot was a prototype in development, many of the functionalities described on the remote control are not reflecting their final purpose. 
+The image below shows naming convention used for the buttons and the joys as they are used in the state machine logic and diagram. **Not every button is mentioned in the diagram  - they are displayed in blue text** 
+![View of the remote control with descriptions used in state machine diagram](./assets/pulpit_z_piktogramami_.svg)
 
 
-## 2. Steering modes
+## Steering modes
 
 ###
 
@@ -21,6 +23,7 @@ Because the robot was a prototype in development, many of the functionalities de
 
 To ensure legibility and maximal simplicity for a coder - the sequence diagram is represented in mermaid.js code as follows:
 
+## State machine sequence diagram
 ```mermaid
 sequenceDiagram
 participant M as Malfunction
