@@ -1,6 +1,5 @@
 # Operating manual for plastering robot drivetrain
-This is a project of steering algorithm dedicated for a prototype of plastering robot created at CBRTP, 
-where I was responsible for development, testing and documenting the operational capabilities of the drivetrain.
+This is a project of steering algorithm dedicated for a prototype of plastering robot created at CBRTP,  where I was responsible for development, testing and documenting the operational capabilities of the drivetrain.
 
 ## Introduction
 The robot has a total of 4 wheels, each is driven by two motors - one responsible for driving, the second one - for steering. 
@@ -9,14 +8,23 @@ It has two joysticks - their respective purposes are described in chapter () and
 ![View of the remote control with initial descriptions in polish](./assets/pulpit_z_piktogramami_.svg)
 The red buttons are bistable, the green buttons - are monostable.
 
-Because the robot was a prototype in development, many of the functionalities described on the remote control are not reflecting their final purpose. 
-The image below shows naming convention used for the buttons and the joys as they are used in the state machine logic and diagram. **Not every button is mentioned in the diagram  - they are displayed in blue text** 
+Because the robot was a prototype in development, many of the functionalities described on the remote control are not reflecting their final purpose. (like "ROZPOCZĘCIE WIERCENIA" is labeled on a state diagram as "ROZP_WIER", but on the remote it was renamed to "TRYB SKRĘTU -ODCHYŁ-")
+
+The image below shows naming convention used for the buttons and the joys as they are used in the state machine logic and diagram. **Not every name is mentioned in the diagram  - they are displayed in blue text and are used as a reference** 
 ![View of the remote control with descriptions used in state machine diagram](./assets/legend_IREL_remote.svg)
+The current descriptions in polish used in remote control is on the photo below
+![View of the remote control with descriptions used in state machine diagram](./assets/Pilot_irel__podpisy_Aktualne_220905_102001.png)
 
 
 ## Steering modes
+There are two distinct driving modes:
+	- ==Yaw mode== (TRYB SKRĘTU -ODCHYŁ-)
+	- ==Simultaneous mode== (TRYB SKRĘTU -JEDNOCZESNY-)
+In each of these modes the wheels can be transitioned into **standby mode**, where the brakes are released and the platform can be moved by hand.
+The principle of operation for each of the modes is illustrated in the illustration below. 
+![Driving modes diagram](./assets/driving modes.svg)
 
-###
+### 
 
 
 
