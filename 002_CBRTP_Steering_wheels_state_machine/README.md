@@ -13,7 +13,8 @@ Because the robot was a prototype in development, many of the functionalities de
 The image below shows naming convention used for the buttons and the joys as they are used in the state machine logic and diagram. **Not every name is mentioned in the diagram  - they are displayed in blue text and are used as a reference** 
 ![View of the remote control with descriptions used in state machine diagram](./assets/legend_IREL_remote.svg)
 The current descriptions in polish used in remote control is on the photo below
-![View of the remote control with descriptions used in state machine diagram](./assets/Pilot_irel__podpisy_Aktualne_220905_102001.png)
+
+![View of the remote control with descriptions used in the prototype in polish](./assets/Pilot_irel__podpisy_Aktualne_220905_102001.png)
 
 
 ## Steering modes
@@ -22,7 +23,8 @@ There are two distinct driving modes:
 	- ==Simultaneous mode== (TRYB SKRĘTU -JEDNOCZESNY-)
 In each of these modes the wheels can be transitioned into **standby mode**, where the brakes are released and the platform can be moved by hand.
 The principle of operation for each of the modes is illustrated in the illustration below. 
-![Driving modes diagram](./assets/driving modes.svg)
+
+![Driving modes diagram](./assets/driving_modes.svg)
 
 ### 
 
