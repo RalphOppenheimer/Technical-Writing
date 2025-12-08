@@ -15,18 +15,24 @@ The image below shows naming convention used for the buttons and the joys as the
 The current descriptions in polish used in remote control is on the photo below
 
 ![View of the remote control with descriptions used in the prototype in polish](./assets/Pilot_irel__podpisy_Aktualne_220905_102001.png)
+### Turning on the robot
+To turn on the robot, **all safety buttons have to be disengaged**, and the robot has to be connected to the 3-phase power socket. On top of that, there is a power switch next to the socket on the robot, which has to be turned into "1". After these steps, remote control can be connected to the robot
+#### Connecting the remote control 
+
 
 
 ## Steering modes
 There are two distinct driving modes:
-	- ==Yaw mode== (TRYB SKRĘTU -ODCHYŁ-)
-	- ==Simultaneous mode== (TRYB SKRĘTU -JEDNOCZESNY-)
-In each of these modes the wheels can be transitioned into **standby mode**, where the brakes are released and the platform can be moved by hand.
+
+1. Yaw mode (TRYB SKRĘTU -ODCHYŁ-)
+2. Simultaneous mode (TRYB SKRĘTU -JEDNOCZESNY-)
+
+In each of these modes the wheels can be transitioned into **standby mode**, where the brakes are released and the platform can be moved by hand for safety purposes.
 The principle of operation for each of the modes is illustrated in the illustration below. 
 
 ![Driving modes diagram](./assets/driving_modes.svg)
 
-### 
+
 
 
 
