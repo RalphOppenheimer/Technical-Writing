@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Torque Arm Visualizer</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600&family=Syne:wght@400;700&display=swap');
+
+  :root {
+    --bg: #0d0f14;
+    --panel: #13161e;
+    --border: #1f2433;
+    --accent: #00e5ff;
+    --accent2: #ff6b35;
+    --accent3: #a8ff78;
+    --text: #c8d0e0;
+    --dim: #4a5568;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    padding: 18px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+  }
+
+  header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  header span {
+    font-size: 0.7rem;
+    color: var(--dim);
+    letter-spacing: 0.05em;
+  }
+
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr auto;
+    flex: 1;
+    gap: 0;
+  }
+
+  .panel {
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .panel-title {
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--dim);
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    flex: 1;
+  }
+
+  .controls {
+    grid-column: 1 / -1;
+    border-top: 1px solid var(--border);
+    padding: 16px 32px;
+    display: flex;
+    gap: 32px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .ctrl-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .ctrl-group label {
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+
+  .ctrl-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 120px;
+    height: 2px;
+    background: var(--border);
+    outline: none;
+    border-radius: 1px;
+  }
+
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+  }
+
+  input[type=number] {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    width: 70px;
+    border-radius: 3px;
+    outline: none;
+  }
+
+  input[type=number]:focus { border-color: var(--accent); }
+
+  .val-display {
+    font-size: 0.75rem;
+    color: var(--accent);
+    min-width: 40px;
+  }
+
+  select {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  select:focus { border-color: var(--accent); }
+
+  .stat-row {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .stat-label {
+    font-size: 0.6rem;
+    color: var(--dim);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .stat-val {
+    font-size: 0.9rem;
+    color: var(--accent3);
+  }
+
+  .animate-btn {
+    background: transparent;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    padding: 6px 14px;
+    cursor: pointer;
+    border-radius: 3px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .animate-btn:hover, .animate-btn.active {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  .custom-editor {
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px;
+    min-width: 280px;
+  }
+  .custom-editor.visible { display: flex; }
+  .custom-editor-title {
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--dim);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 6px;
+  }
+  .vertex-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 160px;
+    overflow-y: auto;
+  }
+  .vertex-list::-webkit-scrollbar { width: 4px; }
+  .vertex-list::-webkit-scrollbar-track { background: var(--bg); }
+  .vertex-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .vertex-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .vertex-row span {
+    font-size: 0.65rem;
+    color: var(--dim);
+    min-width: 18px;
+  }
+  .vertex-row input {
+    width: 58px !important;
+    font-size: 0.7rem !important;
+    padding: 3px 6px !important;
+  }
+  .vertex-del {
+    background: transparent;
+    border: 1px solid #2a3050;
+    color: var(--dim);
+    font-size: 0.65rem;
+    padding: 2px 7px;
+    cursor: pointer;
+    border-radius: 2px;
+    font-family: 'JetBrains Mono', monospace;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .vertex-del:hover { border-color: #ff6b35; color: #ff6b35; }
+  .editor-btns {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .editor-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    padding: 4px 10px;
+    cursor: pointer;
+    border-radius: 3px;
+    letter-spacing: 0.05em;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .editor-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .editor-btn.apply { border-color: var(--accent3); color: var(--accent3); }
+  .editor-btn.apply:hover { background: var(--accent3); color: var(--bg); }
+  .parse-input {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    padding: 5px 8px;
+    border-radius: 3px;
+    outline: none;
+    width: 100%;
+    resize: vertical;
+    min-height: 48px;
+  }
+  .parse-input:focus { border-color: var(--accent); }
+  .parse-hint {
+    font-size: 0.6rem;
+    color: var(--dim);
+    line-height: 1.4;
+  }
+  .parse-error {
+    font-size: 0.62rem;
+    color: #ff6b35;
+    display: none;
+  }
+  .parse-error.visible { display: block; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Torque Arm Visualizer</h1>
+  <span>string wound on rotating polygon · perpendicular arm vs. angle</span>
+</header>
+
+<div class="main">
+  <!-- LEFT: arm radius plot -->
+  <div class="panel">
+    <div class="panel-title">Effective arm radius vs. rotation angle (0 → 2π)</div>
+    <canvas id="plotCanvas"></canvas>
+  </div>
+
+  <!-- RIGHT: geometry view -->
+  <div class="panel" style="border-right:none;">
+    <div class="panel-title">Geometry — polygon · anchor · string · arm</div>
+    <canvas id="geoCanvas"></canvas>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <div class="ctrl-group">
+      <label>Polygon shape</label>
+      <select id="shapeSelect">
+        <option value="square">Square</option>
+        <option value="rectangle">Rectangle</option>
+        <option value="triangle">Triangle</option>
+        <option value="pentagon">Pentagon</option>
+        <option value="hexagon">Hexagon</option>
+        <option value="custom">Custom (L-shape)</option>
+        <option value="userdef">&#9998; Define vertices...</option>
+      </select>
+    </div>
+
+    <div class="custom-editor" id="customEditor">
+      <div class="custom-editor-title">Vertex coordinates &mdash; polygon center at (0,0)</div>
+      <div class="vertex-list" id="vertexList"></div>
+      <div class="editor-btns">
+        <button class="editor-btn" id="addVertexBtn">+ Add vertex</button>
+        <button class="editor-btn" id="clearVerticesBtn">Clear all</button>
+        <button class="editor-btn apply" id="applyVerticesBtn">Apply</button>
+      </div>
+      <textarea class="parse-input" id="parsePaste" placeholder="Paste coords: (x,y) per line&#10;e.g.  1, 1&#10;      -1, 1&#10;      -1, -1&#10;       1, -1"></textarea>
+      <div class="editor-btns">
+        <button class="editor-btn apply" id="parseBtn">Parse &amp; apply</button>
+      </div>
+      <div class="parse-error" id="parseError"></div>
+      <div class="parse-hint">Enter vertices in order (CW or CCW). Polygon rotates around (0,0).</div>
+    </div>
+
+    <div class="ctrl-group">
+      <label>Anchor X</label>
+      <div class="ctrl-row">
+        <input type="range" id="anchorX" min="-20" max="20" step="0.5" value="10">
+        <span class="val-display" id="anchorXVal">10.0</span>
+      </div>
+    </div>
+
+    <div class="ctrl-group">
+      <label>Anchor Y</label>
+      <div class="ctrl-row">
+        <input type="range" id="anchorY" min="-20" max="20" step="0.5" value="0">
+        <span class="val-display" id="anchorYVal">0.0</span>
+      </div>
+    </div>
+
+    <div class="ctrl-group">
+      <label>Current angle</label>
+      <div class="ctrl-row">
+        <input type="range" id="angleSlider" min="0" max="628" step="1" value="0">
+        <span class="val-display" id="angleVal">0.00</span>
+      </div>
+    </div>
+
+    <button class="animate-btn" id="animBtn">▶ Animate</button>
+
+    <div class="stat-row">
+      <div class="stat">
+        <span class="stat-label">Arm at angle</span>
+        <span class="stat-val" id="statCurrent">—</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Min arm</span>
+        <span class="stat-val" id="statMin">—</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Max arm</span>
+        <span class="stat-val" id="statMax">—</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Ratio max/min</span>
+        <span class="stat-val" id="statRatio">—</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── SHAPES ─────────────────────────────────────────────────────────────────
+const SHAPES = {
+  square: [
+    [1, 1], [-1, 1], [-1, -1], [1, -1]
+  ],
+  rectangle: [
+    [2, 0.5], [-2, 0.5], [-2, -0.5], [2, -0.5]
+  ],
+  triangle: [
+    [0, 1.5], [-1.3, -0.75], [1.3, -0.75]
+  ],
+  pentagon: Array.from({length:5}, (_,i) => {
+    const a = i * 2*Math.PI/5 - Math.PI/2;
+    return [1.4*Math.cos(a), 1.4*Math.sin(a)];
+  }),
+  hexagon: Array.from({length:6}, (_,i) => {
+    const a = i * 2*Math.PI/6;
+    return [1.4*Math.cos(a), 1.4*Math.sin(a)];
+  }),
+  custom: [
+    [1.5, 0.3], [0.3, 0.3], [0.3, 1.5], [-0.3, 1.5],
+    [-0.3, 0.3], [-1.5, 0.3], [-1.5, -0.3], [1.5, -0.3]
+  ]
+};
+
+// User-defined vertices (mutable)
+let userVerts = [[1,1],[-1,1],[-1,-1],[1,-1]];
+
+
+// ─── GEOMETRY ────────────────────────────────────────────────────────────────
+
+function rotateVerts(verts, angle) {
+  const c = Math.cos(angle), s = Math.sin(angle);
+  return verts.map(([x, y]) => [c*x - s*y, s*x + c*y]);
+}
+
+function cross2d(ox, oy, ax, ay, bx, by) {
+  return (ax-ox)*(by-oy) - (ay-oy)*(bx-ox);
+}
+
+/**
+ * For a convex polygon and external point P,
+ * find tangent vertices using cross-product straddling test.
+ * Returns array of tangent candidate vertices.
+ */
+function findTangentPoints(verts, px, py) {
+  const n = verts.length;
+  const tangents = [];
+  for (let i = 0; i < n; i++) {
+    const [cx, cy] = verts[i];
+    const [prevx, prevy] = verts[(i - 1 + n) % n];
+    const [nextx, nexty] = verts[(i + 1) % n];
+
+    const c1 = cross2d(px, py, cx, cy, prevx, prevy);
+    const c2 = cross2d(px, py, cx, cy, nextx, nexty);
+
+    // Tangent vertex: adjacent edges straddle the line from P
+    if (c1 * c2 <= 0) {
+      tangents.push([cx, cy]);
+    }
+  }
+  return tangents;
+}
+
+/**
+ * Perpendicular distance from origin (0,0) to the line through (ax,ay)→(bx,by).
+ * Line defined by two points; distance = |det| / |AB|
+ */
+function perpDistOriginToLine(ax, ay, bx, by) {
+  const dx = bx - ax, dy = by - ay;
+  const len = Math.sqrt(dx*dx + dy*dy);
+  if (len < 1e-12) return 0;
+  // det = ax*by - ay*bx (same as ax*(by-ay) - ay*(bx-ax) + ... simplified)
+  return Math.abs(ax * dy - ay * dx) / len;
+}
+
+/**
+ * Compute effective torque arm at a given rotation angle.
+ * The string is wound on the polygon and always contacts the vertex that
+ * maximizes the perpendicular distance from the center of rotation (origin)
+ * to the string line (vertex → anchor). This models a string that is being
+ * unwound: it always sits at the outermost wrap point, never reaching zero.
+ * Returns { arm, contactPoint }
+ */
+function computeArm(baseVerts, angle, px, py) {
+  const verts = rotateVerts(baseVerts, angle);
+  const n = verts.length;
+
+  // Physical model: string wound on polygon, unwinds from the top.
+  // The contact vertex is the one where the line (V -> anchor) is a
+  // "supporting line": ALL other vertices lie on the same side of it.
+  // This is exactly where the string leaves the polygon surface.
+  // Among multiple valid candidates, pick the one with highest Y (topmost)
+  // so the string models unwinding from the upper part of the polygon.
+
+  const candidates = [];
+
+  for (let i = 0; i < n; i++) {
+    const [vx, vy] = verts[i];
+    const dx = px - vx, dy = py - vy; // direction: V -> anchor
+
+    let sign = 0;
+    let isSupporting = true;
+
+    for (let j = 0; j < n; j++) {
+      if (j === i) continue;
+      const [wx, wy] = verts[j];
+      // Cross product: which side of line (V->anchor) is vertex W on?
+      const cross = dx * (wy - vy) - dy * (wx - vx);
+      if (Math.abs(cross) < 1e-9) continue; // on the line, acceptable
+      const s = cross > 0 ? 1 : -1;
+      if (sign === 0) {
+        sign = s;
+      } else if (s !== sign) {
+        isSupporting = false;
+        break;
+      }
+    }
+
+    if (isSupporting) {
+      candidates.push([vx, vy]);
+    }
+  }
+
+  // Pick candidate with highest Y (string unwinds from top)
+  const pool = candidates.length > 0 ? candidates : verts;
+  let best = pool[0];
+  for (const v of pool) if (v[1] > best[1]) best = v;
+
+  const arm = perpDistOriginToLine(best[0], best[1], px, py);
+  return { arm, contact: best };
+}
+
+/**
+ * Compute full arm curve over 0..2π
+ */
+function computeCurve(baseVerts, px, py, steps = 720) {
+  const arms = [];
+  for (let i = 0; i <= steps; i++) {
+    const angle = i / steps * 2 * Math.PI;
+    arms.push(computeArm(baseVerts, angle, px, py).arm);
+  }
+  return arms;
+}
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+
+let state = {
+  shape: 'square',
+  anchorX: 10,
+  anchorY: 0,
+  angle: 0,
+  animating: false,
+  animId: null,
+};
+
+function getVerts() {
+  if (state.shape === 'userdef') return userVerts;
+  return SHAPES[state.shape];
+}
+
+// ─── PLOT CANVAS ─────────────────────────────────────────────────────────────
+
+const plotCanvas = document.getElementById('plotCanvas');
+const plotCtx = plotCanvas.getContext('2d');
+
+function resizePlot() {
+  const rect = plotCanvas.parentElement.getBoundingClientRect();
+  plotCanvas.width = rect.width - 32;
+  plotCanvas.height = rect.height - 50;
+}
+
+function drawPlot() {
+  const W = plotCanvas.width, H = plotCanvas.height;
+  const ctx = plotCtx;
+  ctx.clearRect(0, 0, W, H);
+
+  // Background
+  ctx.fillStyle = '#0d0f14';
+  ctx.fillRect(0, 0, W, H);
+
+  const pad = { l: 52, r: 20, t: 16, b: 36 };
+  const pw = W - pad.l - pad.r;
+  const ph = H - pad.t - pad.b;
+
+  const verts = getVerts();
+  const curve = computeCurve(verts, state.anchorX, state.anchorY, 720);
+  const minArm = Math.min(...curve);
+  const maxArm = Math.max(...curve);
+  const range = maxArm - minArm || 1;
+
+  // Update stats
+  const curIdx = Math.round(state.angle / (2*Math.PI) * 720);
+  document.getElementById('statCurrent').textContent = (curve[Math.min(curIdx,720)] || 0).toFixed(3);
+  document.getElementById('statMin').textContent = minArm.toFixed(3);
+  document.getElementById('statMax').textContent = maxArm.toFixed(3);
+  document.getElementById('statRatio').textContent = (maxArm / (minArm || 0.001)).toFixed(3);
+
+  // Grid lines
+  ctx.strokeStyle = '#1a1f2e';
+  ctx.lineWidth = 1;
+  const ySteps = 5;
+  for (let i = 0; i <= ySteps; i++) {
+    const y = pad.t + ph - i / ySteps * ph;
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(pad.l + pw, y); ctx.stroke();
+    const val = minArm + i / ySteps * range;
+    ctx.fillStyle = '#3a4560';
+    ctx.font = '10px JetBrains Mono';
+    ctx.textAlign = 'right';
+    ctx.fillText(val.toFixed(2), pad.l - 6, y + 4);
+  }
+
+  // X axis labels
+  ctx.textAlign = 'center';
+  const xLabels = ['0', 'π/2', 'π', '3π/2', '2π'];
+  for (let i = 0; i < xLabels.length; i++) {
+    const x = pad.l + i / 4 * pw;
+    ctx.fillStyle = '#3a4560';
+    ctx.fillText(xLabels[i], x, H - 6);
+    ctx.beginPath(); ctx.moveTo(x, pad.t); ctx.lineTo(x, pad.t + ph);
+    ctx.strokeStyle = '#1a1f2e'; ctx.stroke();
+  }
+
+  // Axis labels
+  ctx.save();
+  ctx.translate(12, pad.t + ph/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.fillStyle = '#4a5568';
+  ctx.font = '10px JetBrains Mono';
+  ctx.textAlign = 'center';
+  ctx.fillText('arm radius', 0, 0);
+  ctx.restore();
+
+  // Fill under curve
+  ctx.beginPath();
+  for (let i = 0; i <= 720; i++) {
+    const x = pad.l + i / 720 * pw;
+    const y = pad.t + ph - (curve[i] - minArm) / range * ph;
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  }
+  ctx.lineTo(pad.l + pw, pad.t + ph);
+  ctx.lineTo(pad.l, pad.t + ph);
+  ctx.closePath();
+  const grad = ctx.createLinearGradient(0, pad.t, 0, pad.t + ph);
+  grad.addColorStop(0, 'rgba(0,229,255,0.18)');
+  grad.addColorStop(1, 'rgba(0,229,255,0.01)');
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Curve line
+  ctx.beginPath();
+  ctx.strokeStyle = '#00e5ff';
+  ctx.lineWidth = 2;
+  for (let i = 0; i <= 720; i++) {
+    const x = pad.l + i / 720 * pw;
+    const y = pad.t + ph - (curve[i] - minArm) / range * ph;
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // Current angle marker
+  const cx = pad.l + (state.angle / (2*Math.PI)) * pw;
+  const curArm = curve[Math.min(curIdx, 720)];
+  const cy = pad.t + ph - (curArm - minArm) / range * ph;
+
+  ctx.beginPath();
+  ctx.strokeStyle = 'rgba(255,107,53,0.4)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 4]);
+  ctx.moveTo(cx, pad.t); ctx.lineTo(cx, pad.t + ph);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.beginPath();
+  ctx.arc(cx, cy, 5, 0, 2*Math.PI);
+  ctx.fillStyle = '#ff6b35';
+  ctx.fill();
+}
+
+// ─── GEO CANVAS ──────────────────────────────────────────────────────────────
+
+const geoCanvas = document.getElementById('geoCanvas');
+const geoCtx = geoCanvas.getContext('2d');
+
+function resizeGeo() {
+  const rect = geoCanvas.parentElement.getBoundingClientRect();
+  geoCanvas.width = rect.width - 32;
+  geoCanvas.height = rect.height - 50;
+}
+
+function drawGeo() {
+  const W = geoCanvas.width, H = geoCanvas.height;
+  const ctx = geoCtx;
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#0d0f14';
+  ctx.fillRect(0, 0, W, H);
+
+  const verts = getVerts();
+  const px = state.anchorX, py = state.anchorY;
+
+  // Determine scale to fit everything
+  const allX = verts.map(v=>v[0]).concat([px, 0]);
+  const allY = verts.map(v=>v[1]).concat([py, 0]);
+  const maxR = Math.max(
+    ...verts.map(v => Math.sqrt(v[0]**2+v[1]**2)),
+    Math.sqrt(px**2+py**2) + 0.5
+  );
+  const pad = 32;
+  const scale = (Math.min(W, H) - pad*2) / (2 * maxR);
+  const cx = W/2, cy = H/2;
+
+  function tx(x) { return cx + x * scale; }
+  function ty(y) { return cy - y * scale; }
+
+  // Grid
+  ctx.strokeStyle = '#1a1f2e';
+  ctx.lineWidth = 1;
+  for (let i = -Math.ceil(maxR); i <= Math.ceil(maxR); i++) {
+    ctx.beginPath(); ctx.moveTo(tx(i), pad); ctx.lineTo(tx(i), H-pad);
+    ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(pad, ty(i)); ctx.lineTo(W-pad, ty(i));
+    ctx.stroke();
+  }
+
+  // Axes
+  ctx.strokeStyle = '#2a3050';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(pad, ty(0)); ctx.lineTo(W-pad, ty(0)); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(tx(0), pad); ctx.lineTo(tx(0), H-pad); ctx.stroke();
+
+  // Origin
+  ctx.beginPath();
+  ctx.arc(tx(0), ty(0), 4, 0, 2*Math.PI);
+  ctx.fillStyle = '#2a3050'; ctx.fill();
+  ctx.strokeStyle = '#3a4570'; ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.fillStyle = '#3a4570';
+  ctx.font = '10px JetBrains Mono';
+  ctx.fillText('(0,0)', tx(0)+6, ty(0)-4);
+
+  // Rotated polygon
+  const rv = rotateVerts(verts, state.angle);
+  ctx.beginPath();
+  rv.forEach(([x, y], i) => i === 0 ? ctx.moveTo(tx(x), ty(y)) : ctx.lineTo(tx(x), ty(y)));
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(0,229,255,0.07)';
+  ctx.fill();
+  ctx.strokeStyle = '#00e5ff';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Vertices dots
+  rv.forEach(([x, y]) => {
+    ctx.beginPath();
+    ctx.arc(tx(x), ty(y), 3, 0, 2*Math.PI);
+    ctx.fillStyle = '#00e5ff'; ctx.fill();
+  });
+
+  // Ghost polygon (original position)
+  ctx.beginPath();
+  verts.forEach(([x, y], i) => i === 0 ? ctx.moveTo(tx(x), ty(y)) : ctx.lineTo(tx(x), ty(y)));
+  ctx.closePath();
+  ctx.strokeStyle = 'rgba(0,229,255,0.12)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([3, 5]);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Find tangent + arm
+  const { arm, contact } = computeArm(verts, state.angle, px, py);
+
+  if (contact) {
+    const [tx2, ty2] = contact;
+
+    // String line: anchor → contact
+    ctx.beginPath();
+    ctx.moveTo(tx(px), ty(py));
+    ctx.lineTo(tx(tx2), ty(ty2));
+    ctx.strokeStyle = '#a8ff78';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Arm: perpendicular from origin to line
+    // Foot of perpendicular from origin onto line (anchor→contact)
+    const dx = px - tx2, dy = py - ty2;
+    const len2 = dx*dx + dy*dy;
+    const t = ((-tx2)*dx + (-ty2)*dy) / len2;
+    // foot point (clamped to [0,1] to stay on segment)
+    const ft = Math.max(0, Math.min(1, t));
+    const footX = tx2 + ft * dx;
+    const footY = ty2 + ft * dy;
+
+    // Arm line: origin → foot
+    ctx.beginPath();
+    ctx.moveTo(tx(0), ty(0));
+    ctx.lineTo(tx(footX), ty(footY));
+    ctx.strokeStyle = '#ff6b35';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([5, 4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Right-angle marker at foot
+    const perpLen = 5;
+    const ddx = dx/Math.sqrt(len2), ddy = dy/Math.sqrt(len2);
+    const ox = -ddy, oy = ddx; // perpendicular direction
+    ctx.beginPath();
+    ctx.moveTo(tx(footX) + ox*perpLen, ty(footY) + oy*perpLen);
+    ctx.lineTo(tx(footX) + ox*perpLen + ddx*perpLen, ty(footY) + oy*perpLen + ddy*perpLen);
+    ctx.lineTo(tx(footX) + ddx*perpLen, ty(footY) + ddy*perpLen);
+    ctx.strokeStyle = 'rgba(255,107,53,0.5)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Foot dot
+    ctx.beginPath();
+    ctx.arc(tx(footX), ty(footY), 4, 0, 2*Math.PI);
+    ctx.fillStyle = '#ff6b35'; ctx.fill();
+
+    // Contact point dot
+    ctx.beginPath();
+    ctx.arc(tx(tx2), ty(ty2), 5, 0, 2*Math.PI);
+    ctx.fillStyle = '#a8ff78'; ctx.fill();
+
+    // Arm label
+    const midX = (0 + footX) / 2;
+    const midY = (0 + footY) / 2;
+    ctx.fillStyle = '#ff6b35';
+    ctx.font = '11px JetBrains Mono';
+    ctx.textAlign = 'left';
+    ctx.fillText('r=' + arm.toFixed(2), tx(midX)+6, ty(midY)-4);
+  }
+
+  // Anchor point
+  ctx.beginPath();
+  ctx.arc(tx(px), ty(py), 7, 0, 2*Math.PI);
+  ctx.fillStyle = '#ff6b35';
+  ctx.strokeStyle = '#ff6b35';
+  ctx.lineWidth = 2;
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(tx(px), ty(py), 11, 0, 2*Math.PI);
+  ctx.strokeStyle = 'rgba(255,107,53,0.3)';
+  ctx.stroke();
+  ctx.fillStyle = '#ff6b35';
+  ctx.font = '11px JetBrains Mono';
+  ctx.textAlign = 'left';
+  ctx.fillText(`anchor (${px}, ${py})`, tx(px)+14, ty(py)+4);
+
+  // Center of mass
+  ctx.beginPath();
+  ctx.arc(tx(0), ty(0), 5, 0, 2*Math.PI);
+  ctx.fillStyle = '#fff'; ctx.fill();
+
+  // Legend
+  const leg = [
+    ['#00e5ff', 'polygon (rotated)'],
+    ['#a8ff78', 'string'],
+    ['#ff6b35', 'torque arm (⊥ dist)'],
+  ];
+  leg.forEach(([col, label], i) => {
+    ctx.fillStyle = col;
+    ctx.fillRect(10, 10 + i*18, 12, 3);
+    ctx.fillStyle = '#6a7590';
+    ctx.font = '10px JetBrains Mono';
+    ctx.textAlign = 'left';
+    ctx.fillText(label, 26, 14 + i*18);
+  });
+}
+
+// ─── CONTROLS ────────────────────────────────────────────────────────────────
+
+document.getElementById('shapeSelect').addEventListener('change', e => {
+  state.shape = e.target.value;
+  const editor = document.getElementById('customEditor');
+  if (state.shape === 'userdef') {
+    editor.classList.add('visible');
+    renderVertexList();
+  } else {
+    editor.classList.remove('visible');
+  }
+  redraw();
+});
+
+// ─── CUSTOM VERTEX EDITOR ────────────────────────────────────────────────────
+
+function renderVertexList() {
+  const list = document.getElementById('vertexList');
+  list.innerHTML = '';
+  userVerts.forEach(([x, y], i) => {
+    const row = document.createElement('div');
+    row.className = 'vertex-row';
+    row.innerHTML = `
+      <span>V${i+1}</span>
+      <input type="number" step="0.1" value="${x}" data-idx="${i}" data-axis="x" />
+      <input type="number" step="0.1" value="${y}" data-idx="${i}" data-axis="y" />
+      <button class="vertex-del" data-idx="${i}">✕</button>
+    `;
+    list.appendChild(row);
+  });
+
+  // Input listeners
+  list.querySelectorAll('input[type=number]').forEach(inp => {
+    inp.addEventListener('input', e => {
+      const idx = parseInt(e.target.dataset.idx);
+      const axis = e.target.dataset.axis;
+      const val = parseFloat(e.target.value) || 0;
+      if (axis === 'x') userVerts[idx][0] = val;
+      else               userVerts[idx][1] = val;
+      redraw();
+    });
+  });
+
+  // Delete listeners
+  list.querySelectorAll('.vertex-del').forEach(btn => {
+    btn.addEventListener('click', e => {
+      const idx = parseInt(e.target.dataset.idx);
+      if (userVerts.length <= 3) return; // minimum 3 vertices
+      userVerts.splice(idx, 1);
+      renderVertexList();
+      redraw();
+    });
+  });
+}
+
+document.getElementById('addVertexBtn').addEventListener('click', () => {
+  // Add a new vertex slightly offset from last one
+  const last = userVerts[userVerts.length - 1] || [1, 0];
+  userVerts.push([parseFloat((last[0] * 0.8).toFixed(2)), parseFloat((-last[1] * 0.8).toFixed(2))]);
+  renderVertexList();
+  redraw();
+});
+
+document.getElementById('clearVerticesBtn').addEventListener('click', () => {
+  userVerts = [[1,0],[0,1],[-1,0],[0,-1]];
+  renderVertexList();
+  redraw();
+});
+
+document.getElementById('applyVerticesBtn').addEventListener('click', () => {
+  redraw();
+});
+
+document.getElementById('parseBtn').addEventListener('click', () => {
+  const raw = document.getElementById('parsePaste').value.trim();
+  const errEl = document.getElementById('parseError');
+  if (!raw) return;
+
+  // Accept formats: "x y", "x,y", "(x,y)", "x; y" — one vertex per line
+  const lines = raw.split(/\n/).map(l => l.trim()).filter(l => l.length > 0);
+  const parsed = [];
+  for (const line of lines) {
+    // Strip parens/brackets
+    const clean = line.replace(/[()\[\]]/g, '');
+    // Split on comma, semicolon, or whitespace
+    const parts = clean.split(/[,;\s]+/).map(p => p.trim()).filter(p => p !== '');
+    if (parts.length < 2) {
+      errEl.textContent = 'Could not parse: "' + line + '" — expected two numbers per line';
+      errEl.classList.add('visible');
+      return;
+    }
+    const x = parseFloat(parts[0]), y = parseFloat(parts[1]);
+    if (isNaN(x) || isNaN(y)) {
+      errEl.textContent = 'Invalid number in: "' + line + '"';
+      errEl.classList.add('visible');
+      return;
+    }
+    parsed.push([x, y]);
+  }
+  if (parsed.length < 3) {
+    errEl.textContent = 'Need at least 3 vertices.';
+    errEl.classList.add('visible');
+    return;
+  }
+  errEl.classList.remove('visible');
+  userVerts = parsed;
+  document.getElementById('parsePaste').value = '';
+  renderVertexList();
+  redraw();
+});
+
+
+document.getElementById('anchorX').addEventListener('input', e => {
+  state.anchorX = parseFloat(e.target.value);
+  document.getElementById('anchorXVal').textContent = state.anchorX.toFixed(1);
+  redraw();
+});
+
+document.getElementById('anchorY').addEventListener('input', e => {
+  state.anchorY = parseFloat(e.target.value);
+  document.getElementById('anchorYVal').textContent = state.anchorY.toFixed(1);
+  redraw();
+});
+
+document.getElementById('angleSlider').addEventListener('input', e => {
+  state.angle = parseInt(e.target.value) / 100;
+  document.getElementById('angleVal').textContent = state.angle.toFixed(2);
+  redraw();
+});
+
+const animBtn = document.getElementById('animBtn');
+animBtn.addEventListener('click', () => {
+  if (state.animating) {
+    state.animating = false;
+    cancelAnimationFrame(state.animId);
+    animBtn.textContent = '▶ Animate';
+    animBtn.classList.remove('active');
+  } else {
+    state.animating = true;
+    animBtn.textContent = '⏹ Stop';
+    animBtn.classList.add('active');
+    animate();
+  }
+});
+
+function animate() {
+  if (!state.animating) return;
+  state.angle = (state.angle + 0.01) % (2 * Math.PI);
+  const sliderVal = Math.round(state.angle * 100);
+  document.getElementById('angleSlider').value = sliderVal;
+  document.getElementById('angleVal').textContent = state.angle.toFixed(2);
+  redraw();
+  state.animId = requestAnimationFrame(animate);
+}
+
+function redraw() {
+  drawPlot();
+  drawGeo();
+}
+
+// ─── RESIZE ──────────────────────────────────────────────────────────────────
+
+function onResize() {
+  resizePlot();
+  resizeGeo();
+  redraw();
+}
+
+window.addEventListener('resize', onResize);
+window.addEventListener('load', () => {
+  setTimeout(onResize, 50);
+});
+</script>
+</body>
+</html>
