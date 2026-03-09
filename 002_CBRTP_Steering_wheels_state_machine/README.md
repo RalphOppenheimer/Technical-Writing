@@ -189,7 +189,7 @@ The state machine described above uses memory of the previous state as well as g
 When wheels are during a certain operation specified by **transitional state**, the inputs from remote are ignored for safety reasons. The only exception is emergency stop button, which operates independently of the state machine logic. **Transitional states** were introduced to put wheels in certain positions to save time during adjustment of position relative to the target wall.
 
 #### Examples of states 
-Here are examples of trasitional states:
+Here are examples of transitional states:
 
 SWHEELS_YAW_NEG_120_7 - When in **Yaw mode**, this state turns the wheels to their maximum turning position to change the angle relative to the wall without translational motion (around the middle of the platform). This states automatically returns to "YAW_DRIVE_READY_9" state after completion.
 

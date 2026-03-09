@@ -63,11 +63,11 @@
      inkscape:pageopacity="0.0"
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
-     inkscape:zoom="0.47029375"
-     inkscape:cx="703.81543"
-     inkscape:cy="996.18589"
+     inkscape:zoom="0.6650958"
+     inkscape:cx="694.63677"
+     inkscape:cy="272.89302"
      inkscape:window-width="1598"
-     inkscape:window-height="1701"
+     inkscape:window-height="1033"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="0"
@@ -1600,7 +1600,7 @@
          sodipodi:role="line"
          id="tspan3-2-8"
          x="1008.5443"
-         y="337.31207">L_HOR_4+</tspan></text>
+         y="337.31207">R_HOR_4+</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:21.3333px;font-family:Cambria;-inkscape-font-specification:Cambria;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.89;stroke-dasharray:none"
@@ -1610,7 +1610,7 @@
          sodipodi:role="line"
          id="tspan3-2-3-4"
          x="718.66797"
-         y="337.31207">L_HOR_4-</tspan></text>
+         y="337.31207">R_HOR_4-</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:21.3333px;font-family:Cambria;-inkscape-font-specification:Cambria;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.89;stroke-dasharray:none"
@@ -1620,7 +1620,7 @@
          sodipodi:role="line"
          id="tspan3-2-6-7"
          x="868.13678"
-         y="207.40147">L_VER_4+</tspan></text>
+         y="207.40147">R_VER_4+</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:21.3333px;font-family:Cambria;-inkscape-font-specification:Cambria;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.89;stroke-dasharray:none"
@@ -1630,7 +1630,7 @@
          sodipodi:role="line"
          id="tspan3-2-6-9-9"
          x="870.41803"
-         y="459.30994">L_VER_4-</tspan></text>
+         y="459.30994">R_VER_4-</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:21.3333px;font-family:Cambria;-inkscape-font-specification:Cambria;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#00ccff;fill-opacity:1;stroke:none;stroke-width:1.89;stroke-dasharray:none"
