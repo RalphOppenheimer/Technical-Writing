@@ -1,6 +1,6 @@
 # Torque arm visualizer - user manual
 
-![View of the program](./assets/260306-181441-%pn.png)
+![View of the program](./assets/260306-181441.png)
 
 ## What does it do?
 This program shows how the torque (effective arm) changes (1), when you rotate a 2D figure, to which a string is attached.
