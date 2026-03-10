@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Platform Levelling Simulator</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap');
+  :root {
+    --bg:    #07090e;
+    --surf:  #0d1119;
+    --panel: #0f1520;
+    --bord:  #18232f;
+    --acc:   #00cfff;
+    --v1c:   #ff5028;
+    --v2c:   #3dff8a;
+    --h1c:   #ffcf2a;
+    --h2c:   #be55ff;
+    --pivc:  #00cfff;
+    --txt:   #b8ccd8;
+    --dim:   #364a58;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Rajdhani',sans-serif;
+       height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+
+  header{display:flex;align-items:center;gap:12px;padding:7px 16px;
+         border-bottom:1px solid var(--bord);background:var(--surf);flex-shrink:0;}
+  header h1{font-size:.95rem;font-weight:700;letter-spacing:.16em;
+            text-transform:uppercase;color:var(--acc);}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--v2c);
+       box-shadow:0 0 7px var(--v2c);animation:bk 2s ease-in-out infinite;}
+  @keyframes bk{0%,100%{opacity:1}50%{opacity:.2}}
+  .legend{margin-left:auto;display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
+  .li{display:flex;align-items:center;gap:5px;font-family:'Share Tech Mono',monospace;
+      font-size:.59rem;color:var(--dim);}
+  .ll{width:20px;height:3px;border-radius:2px;}
+  .ld{width:8px;height:8px;border-radius:50%;}
+
+  .main{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr auto;
+        flex:1;overflow:hidden;}
+  .panel{display:flex;flex-direction:column;border:1px solid var(--bord);overflow:hidden;}
+  .ph{font-family:'Share Tech Mono',monospace;font-size:.61rem;color:var(--dim);
+      letter-spacing:.09em;padding:5px 11px;border-bottom:1px solid var(--bord);
+      background:var(--surf);display:flex;justify-content:space-between;
+      align-items:center;flex-shrink:0;}
+  .cw{flex:1;position:relative;overflow:hidden;}
+  canvas{display:block;width:100%;height:100%;}
+
+  .controls{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:9px;
+            padding:8px 14px;background:var(--surf);
+            border-top:1px solid var(--bord);align-items:center;flex-shrink:0;}
+  .cg{display:flex;flex-direction:column;gap:2px;}
+  .cg label{font-family:'Share Tech Mono',monospace;font-size:.57rem;color:var(--dim);
+            letter-spacing:.08em;text-transform:uppercase;}
+  .row{display:flex;align-items:center;gap:6px;}
+  input[type=range]{-webkit-appearance:none;height:3px;background:var(--bord);
+    border-radius:2px;outline:none;cursor:pointer;width:96px;}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;
+    border-radius:50%;background:var(--acc);box-shadow:0 0 5px var(--acc);cursor:pointer;}
+  input[type=number]{background:var(--bg);border:1px solid var(--bord);color:var(--txt);
+    font-family:'Share Tech Mono',monospace;font-size:.68rem;padding:2px 4px;
+    width:62px;border-radius:3px;outline:none;}
+  input[type=number]:focus{border-color:var(--acc);}
+  .vd{font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--acc);min-width:40px;}
+  .sep{width:1px;height:32px;background:var(--bord);margin:0 2px;}
+  .btn{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.78rem;
+       letter-spacing:.1em;text-transform:uppercase;padding:5px 14px;
+       border:1px solid var(--acc);background:transparent;color:var(--acc);
+       cursor:pointer;border-radius:3px;transition:all .15s;white-space:nowrap;}
+  .btn:hover{background:var(--acc);color:var(--bg);box-shadow:0 0 9px var(--acc);}
+  .btn.r{border-color:var(--v1c);color:var(--v1c);}
+  .btn.r:hover{background:var(--v1c);color:var(--bg);box-shadow:0 0 9px var(--v1c);}
+  .cf{display:flex;gap:4px;align-items:center;}
+  .cf span{font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--dim);}
+  .info{font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--dim);
+        border:1px solid var(--bord);border-radius:3px;padding:3px 8px;line-height:1.6;}
+  .info b{color:var(--acc);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="dot"></div>
+  <h1>Platform Levelling Simulator</h1>
+  <div class="legend">
+    <div class="li"><div class="ll" style="background:var(--v1c)"></div>V1 · Vertical 1</div>
+    <div class="li"><div class="ll" style="background:var(--v2c)"></div>V2 · Vertical 2</div>
+    <div class="li"><div class="ll" style="background:var(--h1c)"></div>H1 · platform ↔ T1</div>
+    <div class="li"><div class="ll" style="background:var(--h2c)"></div>H2 · platform ↔ T2</div>
+    <div class="li"><div class="ld" style="background:var(--pivc)"></div>Pivot (world-fixed)</div>
+  </div>
+</header>
+
+<div class="main">
+  <div class="panel">
+    <div class="ph">
+      <span>ACTUATOR LENGTH CHANGE — Δ FROM INITIAL  [mm]</span>
+      <span id="tLbl">t = 0.00 s</span>
+    </div>
+    <div class="cw"><canvas id="cChart"></canvas></div>
+  </div>
+  <div class="panel">
+    <div class="ph">
+      <span>PLATFORM ANIMATION — SIDE VIEW</span>
+      <span id="aLbl">θ = 0.0°</span>
+    </div>
+    <div class="cw"><canvas id="cAnim"></canvas></div>
+  </div>
+
+  <div class="controls">
+    <div class="cg">
+      <label>Initial Tilt θ₀</label>
+      <div class="row">
+        <input type="range" id="sTilt" min="-28" max="28" value="18" step=".5">
+        <span class="vd" id="vTilt">18.0°</span>
+      </div>
+    </div>
+    <div class="sep"></div>
+    <div class="cg">
+      <label>V1 Ground Anchor (x,y) mm</label>
+      <div class="cf">
+        <span>x</span><input type="number" id="g1x" value="-160" step="10">
+        <span>y</span><input type="number" id="g1y" value="0" step="10">
+      </div>
+    </div>
+    <div class="cg">
+      <label>V2 Ground Anchor (x,y) mm</label>
+      <div class="cf">
+        <span>x</span><input type="number" id="g2x" value="160" step="10">
+        <span>y</span><input type="number" id="g2y" value="0" step="10">
+      </div>
+    </div>
+    <div class="cg">
+      <label>Pivot Point (x,y) mm</label>
+      <div class="cf">
+        <span>x</span><input type="number" id="pvx" value="0" step="10">
+        <span>y</span><input type="number" id="pvy" value="220" step="10">
+      </div>
+    </div>
+    <div class="sep"></div>
+    <div class="cg">
+      <label>Speed</label>
+      <div class="row">
+        <input type="range" id="sSpd" min=".2" max="4" value="1" step=".1">
+        <span class="vd" id="vSpd">1.0×</span>
+      </div>
+    </div>
+    <div class="sep"></div>
+    <button class="btn" id="btnPlay" onclick="togglePlay()">▶ START</button>
+    <button class="btn r" onclick="resetSim()">↺ RESET</button>
+    <div class="info" id="infoBox">—</div>
+  </div>
+</div>
+
+<script>
+/*
+═══════════════════════════════════════════════════════════════════════════
+  MECHANICAL MODEL
+═══════════════════════════════════════════════════════════════════════════
+
+  Platform: rigid plank, rotates from θ₀ → 0 (level) around the
+  world-fixed PIVOT point P.
+
+  Platform direction:  d(θ) = (cosθ, sinθ)
+  Platform normal:     n(θ) = (−sinθ, cosθ)   [points away from ground]
+
+  VERTICAL ACTUATORS V1, V2
+  ─────────────────────────
+  • Ground anchors G1, G2 are FIXED in world space (user input).
+  • Each actuator is always PERPENDICULAR to the platform.
+  • Length: L_i(θ) = (P − G_i) · n(θ)
+      = (P.x−G_i.x)(−sinθ) + (P.y−G_i.y)(cosθ)
+  • Top-pin world position:
+      T_i(θ) = G_i + L_i · n(θ)
+    (T_i lies on the platform line by construction.)
+
+  HORIZONTAL ACTUATORS H1, H2
+  ─────────────────────────────
+  • H1 connects: [platform-body pin A1] ↔ [top of V1 = T1]
+  • H2 connects: [platform-body pin A2] ↔ [top of V2 = T2]
+  • The platform-body pins A1, A2 are FIXED in the platform's LOCAL frame.
+    Their local positions are set once at θ₀ (initial state):
+      A1_local = T1(θ₀) expressed in platform-local coords
+      A2_local = T2(θ₀) expressed in platform-local coords
+    → so at t=0, each H-actuator has zero length (A_i coincides with T_i).
+    As the platform rotates, A_i moves with the platform while T_i is
+    constrained by the fixed ground anchor + perpendicularity rule.
+    The H-actuator length = |A_i(θ) − T_i(θ)|, always parallel to platform.
+
+  Why they stay parallel to the platform:
+    Both A_i and T_i lie on the platform line at all times
+    (A_i is a platform point; T_i is the V-actuator top pin which is
+    forced onto the platform by the perpendicularity constraint).
+    Therefore the vector A_i−T_i is always along d(θ). ✓
+
+  Δ lengths reported on chart:
+    ΔV_i = L_i(θ) − L_i(θ₀)
+    ΔH_i = |A_i(θ) − T_i(θ)|  (starts at 0, grows as platform levels)
+═══════════════════════════════════════════════════════════════════════════
+*/
+
+function getP(){
+  return {
+    tiltDeg: parseFloat(document.getElementById('sTilt').value),
+    G1:{ x:+document.getElementById('g1x').value, y:+document.getElementById('g1y').value },
+    G2:{ x:+document.getElementById('g2x').value, y:+document.getElementById('g2y').value },
+    P: { x:+document.getElementById('pvx').value, y:+document.getElementById('pvy').value },
+    spd: parseFloat(document.getElementById('sSpd').value),
+  };
+}
+
+function ease(t){ return t*t*(3-2*t); }
+
+// Platform normal and direction at angle theta
+function basis(theta){
+  return {
+    d:{ x: Math.cos(theta), y: Math.sin(theta) },
+    n:{ x:-Math.sin(theta), y: Math.cos(theta) },
+  };
+}
+
+// V-actuator length and top-pin at angle theta
+function vActuator(G, P, theta){
+  const {n} = basis(theta);
+  const L = (P.x-G.x)*n.x + (P.y-G.y)*n.y;
+  return {
+    L,
+    T:{ x: G.x + L*n.x, y: G.y + L*n.y },
+  };
+}
+
+/*  Platform-local coordinate of a world point W at angle theta:
+    local_along  = (W−P)·d   (position along platform from pivot)
+    local_normal = (W−P)·n   (should be ~0 if W is on the platform)
+*/
+function toLocal(W, P, theta){
+  const {d,n} = basis(theta);
+  return {
+    along: (W.x-P.x)*d.x + (W.y-P.y)*d.y,
+    perp:  (W.x-P.x)*n.x + (W.y-P.y)*n.y,
+  };
+}
+
+// World position of a platform-local point at angle theta
+function toWorld(local_along, local_perp, P, theta){
+  const {d,n} = basis(theta);
+  return {
+    x: P.x + local_along*d.x + local_perp*n.x,
+    y: P.y + local_along*d.y + local_perp*n.y,
+  };
+}
+
+// Full geometry at a given theta, given fixed local coords of A1, A2
+function geomAt(theta, par, A1loc, A2loc){
+  const {G1,G2,P} = par;
+  const v1 = vActuator(G1, P, theta);
+  const v2 = vActuator(G2, P, theta);
+
+  // Platform-body pin world positions (move with platform)
+  const A1w = toWorld(A1loc.along, A1loc.perp, P, theta);
+  const A2w = toWorld(A2loc.along, A2loc.perp, P, theta);
+
+  // H-actuator lengths (signed: positive = A is to the right of T along platform)
+  // Both points lie on platform → difference is purely along d
+  const {d} = basis(theta);
+  const H1 = (A1w.x - v1.T.x)*d.x + (A1w.y - v1.T.y)*d.y;
+  const H2 = (A2w.x - v2.T.x)*d.x + (A2w.y - v2.T.y)*d.y;
+
+  return { v1, v2, A1w, A2w, H1, H2, theta };
+}
+
+// Compute everything needed for a given animation fraction
+function computeState(fraction, par){
+  const theta0 = par.tiltDeg * Math.PI / 180;
+  const theta  = theta0 * (1 - ease(fraction));
+
+  // Reference geometry at theta0
+  const v1ref = vActuator(par.G1, par.P, theta0);
+  const v2ref = vActuator(par.G2, par.P, theta0);
+
+  // A1, A2 platform-local positions: at theta0, they coincide with T1, T2
+  // so H-actuators start at length 0
+  const A1loc = toLocal(v1ref.T, par.P, theta0);
+  const A2loc = toLocal(v2ref.T, par.P, theta0);
+
+  const ref = geomAt(theta0, par, A1loc, A2loc);
+  const cur = geomAt(theta,  par, A1loc, A2loc);
+
+  return {
+    theta, cur, ref, A1loc, A2loc,
+    dV1: cur.v1.L - ref.v1.L,
+    dV2: cur.v2.L - ref.v2.L,
+    dH1: cur.H1 - ref.H1,   // ref.H1 = 0 by construction
+    dH2: cur.H2 - ref.H2,
+  };
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  SIM STATE
+// ════════════════════════════════════════════════════════════════════════
+const SIM = {
+  playing:false, t:0, dur:5.0, lastTs:null,
+  hist:{ t:[], v1:[], v2:[], h1:[], h2:[] },
+};
+
+// ════════════════════════════════════════════════════════════════════════
+//  DRAW ANIMATION
+// ════════════════════════════════════════════════════════════════════════
+const V1C='#ff5028', V2C='#3dff8a', H1C='#ffcf2a', H2C='#be55ff', PVC='#00cfff';
+
+function drawAnim(fraction){
+  const cv=document.getElementById('cAnim');
+  const wr=cv.parentElement;
+  cv.width=wr.clientWidth; cv.height=wr.clientHeight;
+  const W=cv.width, H=cv.height;
+  const ctx=cv.getContext('2d');
+  ctx.clearRect(0,0,W,H);
+
+  const par = getP();
+  const st  = computeState(fraction, par);
+  const {theta, cur, ref} = st;
+  const {G1,G2,P} = par;
+  const {d,n} = basis(theta);
+  const {v1,v2,A1w,A2w} = cur;
+
+  // ── auto-fit viewport ─────────────────────────────────────────────
+  const keyPts = [
+    G1, G2, P,
+    v1.T, v2.T, A1w, A2w,
+    ref.v1.T, ref.v2.T,
+    {x:P.x-380*d.x, y:P.y-380*d.y},
+    {x:P.x+380*d.x, y:P.y+380*d.y},
+  ];
+  const xs=keyPts.map(p=>p.x), ys=keyPts.map(p=>p.y);
+  const mnX=Math.min(...xs)-90, mxX=Math.max(...xs)+90;
+  const mnY=Math.min(...ys)-70, mxY=Math.max(...ys)+70;
+  const SC = Math.min(W/(mxX-mnX), H/(mxY-mnY)) * 0.84;
+  const OX = W/2 - ((mnX+mxX)/2)*SC;
+  const OY = H/2 + ((mnY+mxY)/2)*SC;
+  const c2 = (wx,wy) => ({x: OX+wx*SC, y: OY-wy*SC});
+
+  // ── ground ────────────────────────────────────────────────────────
+  const gL=c2(mnX-40,0), gR=c2(mxX+40,0);
+  ctx.strokeStyle='#1e3050'; ctx.lineWidth=1.5;
+  ctx.setLineDash([10,7]);
+  ctx.beginPath();ctx.moveTo(gL.x,gL.y);ctx.lineTo(gR.x,gR.y);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.strokeStyle='#111820'; ctx.lineWidth=1;
+  for(let wx=mnX-30; wx<mxX+40; wx+=30){
+    const a=c2(wx,0), b=c2(wx+18,-18);
+    ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+  }
+
+  // ── actuator drawing helper ───────────────────────────────────────
+  function drawAct(wA, wB, color, label){
+    const cA=c2(wA.x,wA.y), cB=c2(wB.x,wB.y);
+    const dx=cB.x-cA.x, dy=cB.y-cA.y;
+    const len=Math.hypot(dx,dy)||1;
+    const nx=-dy/len, ny=dx/len;
+    const BW=7;
+    const mid={x:(cA.x+cB.x)/2, y:(cA.y+cB.y)/2};
+    const rod={x:cA.x+(cB.x-cA.x)*.55, y:cA.y+(cB.y-cA.y)*.55};
+
+    // outer tube
+    ctx.fillStyle=color+'13'; ctx.strokeStyle=color+'60'; ctx.lineWidth=1.2;
+    ctx.beginPath();
+    ctx.moveTo(cA.x+nx*BW,cA.y+ny*BW);
+    ctx.lineTo(cB.x+nx*BW,cB.y+ny*BW);
+    ctx.lineTo(cB.x-nx*BW,cB.y-ny*BW);
+    ctx.lineTo(cA.x-nx*BW,cA.y-ny*BW);
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+    // piston
+    ctx.fillStyle=color+'26';
+    ctx.beginPath();
+    ctx.moveTo(cA.x+nx*(BW*.45),cA.y+ny*(BW*.45));
+    ctx.lineTo(rod.x+nx*(BW*.45),rod.y+ny*(BW*.45));
+    ctx.lineTo(rod.x-nx*(BW*.45),rod.y-ny*(BW*.45));
+    ctx.lineTo(cA.x-nx*(BW*.45),cA.y-ny*(BW*.45));
+    ctx.closePath(); ctx.fill();
+    // centre glow
+    ctx.strokeStyle=color; ctx.lineWidth=1.4;
+    ctx.shadowColor=color; ctx.shadowBlur=6;
+    ctx.beginPath();ctx.moveTo(cA.x,cA.y);ctx.lineTo(cB.x,cB.y);ctx.stroke();
+    ctx.shadowBlur=0;
+    // pins
+    [cA,cB].forEach(p=>{
+      ctx.fillStyle=color; ctx.beginPath(); ctx.arc(p.x,p.y,3.5,0,Math.PI*2); ctx.fill();
+    });
+    // label (offset to normal side)
+    if(label){
+      ctx.font='bold 11px Rajdhani,sans-serif'; ctx.fillStyle=color; ctx.textAlign='center';
+      ctx.fillText(label, mid.x+nx*16, mid.y+ny*16);
+    }
+  }
+
+  // ── ghost of initial position ─────────────────────────────────────
+  if(fraction>0.015 && fraction<0.985){
+    ctx.globalAlpha=0.13;
+    ctx.setLineDash([5,4]);
+    const rd=basis(par.tiltDeg*Math.PI/180);
+    function ghostLine(wA,wB,col){
+      const cA=c2(wA.x,wA.y),cB=c2(wB.x,wB.y);
+      ctx.strokeStyle=col; ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.moveTo(cA.x,cA.y);ctx.lineTo(cB.x,cB.y);ctx.stroke();
+    }
+    ghostLine(G1, ref.v1.T, V1C);
+    ghostLine(G2, ref.v2.T, V2C);
+    ghostLine(ref.A1w, ref.v1.T, H1C);
+    ghostLine(ref.A2w, ref.v2.T, H2C);
+    ctx.setLineDash([]); ctx.globalAlpha=1;
+  }
+
+  // ── platform body ─────────────────────────────────────────────────
+  const PLAT_HALF=360, PLAT_TH=14;
+  const corners=[
+    {x:P.x-PLAT_HALF*d.x - PLAT_TH*n.x, y:P.y-PLAT_HALF*d.y - PLAT_TH*n.y},
+    {x:P.x+PLAT_HALF*d.x - PLAT_TH*n.x, y:P.y+PLAT_HALF*d.y - PLAT_TH*n.y},
+    {x:P.x+PLAT_HALF*d.x + PLAT_TH*n.x, y:P.y+PLAT_HALF*d.y + PLAT_TH*n.y},
+    {x:P.x-PLAT_HALF*d.x + PLAT_TH*n.x, y:P.y-PLAT_HALF*d.y + PLAT_TH*n.y},
+  ].map(p=>c2(p.x,p.y));
+  ctx.fillStyle='#111b28';
+  ctx.beginPath(); corners.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
+  ctx.closePath(); ctx.fill();
+  ctx.strokeStyle='#1e3248'; ctx.lineWidth=1.5;
+  ctx.beginPath(); corners.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
+  ctx.closePath(); ctx.stroke();
+  // top surface
+  ctx.strokeStyle='rgba(0,207,255,.07)'; ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(corners[3].x,corners[3].y);ctx.lineTo(corners[2].x,corners[2].y);ctx.stroke();
+
+  // ── vertical actuators: ground anchor → top pin ───────────────────
+  drawAct(G1, v1.T, V1C, 'V1');
+  drawAct(G2, v2.T, V2C, 'V2');
+
+  // ground anchor symbols
+  [[G1,V1C],[G2,V2C]].forEach(([g,col])=>{
+    const gc=c2(g.x,g.y);
+    ctx.fillStyle=col+'35'; ctx.strokeStyle=col+'80'; ctx.lineWidth=1.3;
+    ctx.beginPath();ctx.moveTo(gc.x,gc.y);ctx.lineTo(gc.x-10,gc.y+14);ctx.lineTo(gc.x+10,gc.y+14);ctx.closePath();
+    ctx.fill();ctx.stroke();
+    ctx.strokeStyle=col+'45'; ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(gc.x-13,gc.y+14);ctx.lineTo(gc.x+13,gc.y+14);ctx.stroke();
+  });
+
+  // ── horizontal actuators: platform pin → V top pin ────────────────
+  // H1: A1w (platform) ↔ T1 (top of V1)
+  drawAct(A1w, v1.T, H1C, 'H1');
+  // H2: A2w (platform) ↔ T2 (top of V2)
+  drawAct(A2w, v2.T, H2C, 'H2');
+
+  // platform-body pin markers (diamond)
+  [[A1w,H1C],[A2w,H2C]].forEach(([aw,col])=>{
+    const ac=c2(aw.x,aw.y);
+    ctx.fillStyle=col; ctx.strokeStyle=col;
+    ctx.beginPath();
+    ctx.moveTo(ac.x,   ac.y-6);
+    ctx.lineTo(ac.x+5, ac.y);
+    ctx.lineTo(ac.x,   ac.y+6);
+    ctx.lineTo(ac.x-5, ac.y);
+    ctx.closePath(); ctx.fill();
+  });
+
+  // ── pivot ─────────────────────────────────────────────────────────
+  const pc=c2(P.x,P.y);
+  ctx.strokeStyle='rgba(0,207,255,.25)'; ctx.lineWidth=1; ctx.setLineDash([3,4]);
+  [[-20,0],[20,0],[0,-20],[0,20]].forEach(([ox,oy])=>{
+    ctx.beginPath();ctx.moveTo(pc.x,pc.y);ctx.lineTo(pc.x+ox,pc.y+oy);ctx.stroke();
+  });
+  ctx.setLineDash([]);
+  ctx.strokeStyle=PVC; ctx.lineWidth=2;
+  ctx.shadowColor=PVC; ctx.shadowBlur=10;
+  ctx.beginPath();ctx.arc(pc.x,pc.y,6,0,Math.PI*2);ctx.stroke(); ctx.shadowBlur=0;
+  ctx.fillStyle=PVC; ctx.beginPath();ctx.arc(pc.x,pc.y,2.5,0,Math.PI*2);ctx.fill();
+  ctx.font='bold 9px Share Tech Mono'; ctx.fillStyle=PVC; ctx.textAlign='left';
+  ctx.fillText('PIVOT',pc.x+9,pc.y-9);
+
+  // angle label
+  const deg=(theta*180/Math.PI).toFixed(2);
+  document.getElementById('aLbl').textContent =
+    Math.abs(theta)<0.003 ? 'θ = 0.00° ✓ LEVEL' : `θ = ${deg}°`;
+
+  // level line
+  if(fraction>.99){
+    const ll=c2(P.x-PLAT_HALF,P.y+PLAT_TH), lr=c2(P.x+PLAT_HALF,P.y+PLAT_TH);
+    ctx.strokeStyle='rgba(61,255,138,.18)'; ctx.lineWidth=1; ctx.setLineDash([14,7]);
+    ctx.beginPath();ctx.moveTo(ll.x,ll.y);ctx.lineTo(lr.x,lr.y);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.font='9px Share Tech Mono'; ctx.fillStyle='#3dff8a'; ctx.textAlign='left';
+    ctx.fillText('LEVEL',lr.x+5,lr.y+3);
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  DRAW CHART
+// ════════════════════════════════════════════════════════════════════════
+function drawChart(){
+  const cv=document.getElementById('cChart');
+  const wr=cv.parentElement;
+  cv.width=wr.clientWidth; cv.height=wr.clientHeight;
+  const W=cv.width,H=cv.height;
+  const ctx=cv.getContext('2d');
+  ctx.clearRect(0,0,W,H);
+
+  const pad={t:22,r:22,b:38,l:58};
+  const cW=W-pad.l-pad.r, cH=H-pad.t-pad.b;
+  ctx.fillStyle='#0b0e16'; ctx.fillRect(pad.l,pad.t,cW,cH);
+
+  const allV=[...SIM.hist.v1,...SIM.hist.v2,...SIM.hist.h1,...SIM.hist.h2,0];
+  const rawMax=Math.max(...allV.map(Math.abs),1);
+  const yR=rawMax*1.3;
+
+  const toX=t=>pad.l+(t/SIM.dur)*cW;
+  const toY=v=>pad.t+cH/2-(v/yR)*(cH/2);
+
+  ctx.strokeStyle='#131c28'; ctx.lineWidth=1;
+  for(let i=0;i<=5;i++){const y=pad.t+(i/5)*cH;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+cW,y);ctx.stroke();}
+  for(let i=0;i<=8;i++){const x=pad.l+(i/8)*cW;ctx.beginPath();ctx.moveTo(x,pad.t);ctx.lineTo(x,pad.t+cH);ctx.stroke();}
+  ctx.strokeStyle='#1c2e3f'; ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(pad.l,toY(0));ctx.lineTo(pad.l+cW,toY(0));ctx.stroke();
+
+  ctx.font='9px Share Tech Mono'; ctx.fillStyle='#36505e'; ctx.textAlign='right';
+  [-1,-.5,0,.5,1].forEach(f=>{
+    const v=f*yR; ctx.fillText(v.toFixed(1),pad.l-5,toY(v)+3);
+  });
+  ctx.textAlign='center';
+  for(let i=0;i<=4;i++)
+    ctx.fillText((i*SIM.dur/4).toFixed(1)+'s',pad.l+(i/4)*cW,pad.t+cH+13);
+
+  ctx.save();ctx.translate(12,pad.t+cH/2);ctx.rotate(-Math.PI/2);
+  ctx.textAlign='center';ctx.fillStyle='#36505e';ctx.font='9px Share Tech Mono';
+  ctx.fillText('Δ LENGTH [mm]',0,0);ctx.restore();
+  ctx.textAlign='center';ctx.fillStyle='#36505e';
+  ctx.fillText('TIME [s]',pad.l+cW/2,H-4);
+
+  const series=[
+    {key:'v1',color:V1C},{key:'v2',color:V2C},
+    {key:'h1',color:H1C},{key:'h2',color:H2C},
+  ];
+  series.forEach(({key,color})=>{
+    const dat=SIM.hist[key];
+    if(dat.length<2)return;
+    ctx.beginPath(); ctx.strokeStyle=color; ctx.lineWidth=2;
+    ctx.shadowColor=color; ctx.shadowBlur=4;
+    dat.forEach((v,i)=>{
+      const x=toX(SIM.hist.t[i]),y=toY(v);
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    });
+    ctx.stroke(); ctx.shadowBlur=0;
+  });
+
+  if(SIM.t>0){
+    const cx=toX(SIM.t);
+    ctx.strokeStyle='rgba(0,207,255,.22)'; ctx.lineWidth=1; ctx.setLineDash([4,4]);
+    ctx.beginPath();ctx.moveTo(cx,pad.t);ctx.lineTo(cx,pad.t+cH);ctx.stroke();
+    ctx.setLineDash([]);
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════
+//  LOOP
+// ════════════════════════════════════════════════════════════════════════
+function tick(ts){
+  if(!SIM.playing)return;
+  if(!SIM.lastTs)SIM.lastTs=ts;
+  const dt=(ts-SIM.lastTs)/1000; SIM.lastTs=ts;
+  const par=getP();
+  SIM.t=Math.min(SIM.t+dt*par.spd, SIM.dur);
+  const frac=SIM.t/SIM.dur;
+  const st=computeState(frac,par);
+  const {dV1,dV2,dH1,dH2,cur}=st;
+
+  SIM.hist.t.push(SIM.t);
+  SIM.hist.v1.push(dV1); SIM.hist.v2.push(dV2);
+  SIM.hist.h1.push(dH1); SIM.hist.h2.push(dH2);
+
+  document.getElementById('tLbl').textContent=`t = ${SIM.t.toFixed(2)} s`;
+  document.getElementById('infoBox').innerHTML=
+    `<b>V1</b> ${cur.v1.L.toFixed(1)} mm &nbsp;`+
+    `<b>V2</b> ${cur.v2.L.toFixed(1)} mm &nbsp;`+
+    `<b>H1</b> ${Math.abs(cur.H1).toFixed(1)} mm &nbsp;`+
+    `<b>H2</b> ${Math.abs(cur.H2).toFixed(1)} mm`;
+
+  drawAnim(frac); drawChart();
+
+  if(SIM.t>=SIM.dur){
+    SIM.playing=false; SIM.lastTs=null;
+    document.getElementById('btnPlay').textContent='▶ REPLAY';
+    return;
+  }
+  requestAnimationFrame(tick);
+}
+
+function togglePlay(){
+  if(SIM.t>=SIM.dur)resetSim();
+  SIM.playing=!SIM.playing;
+  document.getElementById('btnPlay').textContent=SIM.playing?'⏸ PAUSE':'▶ RESUME';
+  if(SIM.playing){SIM.lastTs=null;requestAnimationFrame(tick);}
+}
+
+function resetSim(){
+  SIM.playing=false; SIM.lastTs=null; SIM.t=0;
+  SIM.hist={t:[],v1:[],v2:[],h1:[],h2:[]};
+  document.getElementById('btnPlay').textContent='▶ START';
+  document.getElementById('tLbl').textContent='t = 0.00 s';
+  document.getElementById('infoBox').innerHTML='—';
+  drawAnim(0); drawChart();
+}
+
+// UI wiring
+document.getElementById('sTilt').addEventListener('input',function(){
+  document.getElementById('vTilt').textContent=parseFloat(this.value).toFixed(1)+'°';
+  if(!SIM.playing){drawAnim(SIM.t/SIM.dur);drawChart();}
+});
+document.getElementById('sSpd').addEventListener('input',function(){
+  document.getElementById('vSpd').textContent=parseFloat(this.value).toFixed(1)+'×';
+});
+['g1x','g1y','g2x','g2y','pvx','pvy'].forEach(id=>
+  document.getElementById(id).addEventListener('change',()=>{
+    if(!SIM.playing){drawAnim(SIM.t/SIM.dur);drawChart();}
+  })
+);
+window.addEventListener('resize',()=>{drawAnim(SIM.t/SIM.dur);drawChart();});
+
+drawAnim(0); drawChart();
+</script>
+</body>
+</html>
