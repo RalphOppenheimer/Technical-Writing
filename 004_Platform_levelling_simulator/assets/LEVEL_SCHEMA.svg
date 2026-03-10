@@ -2230,8 +2230,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.7"
-     inkscape:cx="908.57142"
-     inkscape:cy="583.57142"
+     inkscape:cx="680"
+     inkscape:cy="830.71429"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
@@ -2288,6 +2288,13 @@
      inkscape:label="Warstwa 1"
      inkscape:groupmode="layer"
      id="layer1">
+    <rect
+       style="opacity:1;fill:#ffffff;stroke-width:0.15"
+       id="rect1"
+       width="315.54877"
+       height="316.94836"
+       x="-282.37256"
+       y="82.752419" />
     <path
        style="opacity:0.990122;fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m -191.42198,199.84067 h 56.88541"
@@ -3703,14 +3710,14 @@
        id="path6" />
     <text
        xml:space="preserve"
-       style="font-size:3.52777px;font-family:Cambria;-inkscape-font-specification:Cambria;text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.15"
-       x="-95.145813"
-       y="295.69745"
+       style="font-size:6.8441px;font-family:Cambria;-inkscape-font-specification:Cambria;text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.15"
+       x="-95.148239"
+       y="296.84308"
        id="text6"><tspan
          sodipodi:role="line"
          id="tspan6"
          style="stroke:none;stroke-width:0.15"
-         x="-95.145813"
-         y="295.69745">ds</tspan></text>
+         x="-95.148239"
+         y="296.84308">ds</tspan></text>
   </g>
 </svg>
