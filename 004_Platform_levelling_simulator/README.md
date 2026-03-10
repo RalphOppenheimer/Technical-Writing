@@ -16,7 +16,7 @@ After levelling, the final displacements reached after levelling are visible at 
 
 ## Principle of operation
 When the distance between the supproting points of V1 and V2 is estabilished at the unlevelled surface, then during levelling phase, this span will create lateral load, and can lead to damage to the vertical actuators, which operate only in vertical direction. That's why during the levelling, the horizontal actuators H1 and H2 need to compensate change in this span to match the span at the ground when platform is levelled to ensure, that V1 and V2 won't slip, or worse - will bend outwards leading to damage. The cause of such phenomenon is visualized by the image below.
-![Levelling example with graphics](LEVEL_SCHEMA.svg)
+![Levelling example with graphics](./assets/LEVEL_SCHEMA.svg)
 
 In the image, you can denote "ds" as a difference between the initial span do the vertical actuators before levelling, where it is longer (b'1 + b'2 > b"1 + b"2). 
 Without the usage of horizontal actuators, this would directly translate to a torque load at the base of vertical actuators, which may cause damage.
