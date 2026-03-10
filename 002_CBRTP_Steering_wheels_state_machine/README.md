@@ -4,7 +4,7 @@ This is a project of steering algorithm dedicated for a prototype of plastering 
 ## Introduction
 The robot has a total of 4 wheels, each is driven by two motors - one responsible for driving, the second one - for steering. 
 The remote control device dedicated for steering is presented in the image below. 
-It has two joysticks - their respective purposes are described in chapter () and the functionalities of the buttons in chapter ().
+It has two joysticks - their respective purposes are described in chapter **Steering** at the very bottom of this page.
 ![View of the remote control with initial descriptions in polish](./assets/pulpit_z_piktogramami_.svg)
 The red buttons are bistable, the green buttons - are monostable.
 
@@ -28,7 +28,7 @@ To pair up and connect the remote control, a key has to be inserted into the rem
 There are two distinct driving modes:
 
 1. **Yaw mode** - "TRYB SKRĘTU -ODCHYŁ-" - (ROZP_WIER)
-2. **Simultaneous mode** "TRYB SKRĘTU -JEDNOCZESNY-" - (ROZS_PODP)
+2. **Simultaneous mode** - "TRYB SKRĘTU -JEDNOCZESNY-" - (ROZS_PODP)
 
 The principle of operation for each of the modes is shown in the illustration below. Arrows on each of the wheels shows the direction of moving when the robot is commanded to drive forward.
 ![Driving modes diagram](./assets/driving_modes.svg)
@@ -39,13 +39,6 @@ The **Simultaneous mode** - enables the robot to move in translational direction
 
 ## Releasing the brakes for safety purposes
 At any point during operation, the wheels can be transitioned into **standby mode**, where the wheel brakes are released, and the platform can be moved by hand for safety purposes. To do that, the rocker switch on the left has to be turned to down position, towards "KOŁA JEZDNE -ZWOL. HAMUL.-" position (~OBR_ROB). If the driving mode wasn't chosen, the wheels are in standby mode.
-
-
-
-
-
-
-
 
 To ensure legibility and maximal simplicity for a coder - the sequence diagram is represented in mermaid.js code as follows:
 
@@ -191,11 +184,34 @@ When wheels are during a certain operation specified by **transitional state**, 
 #### Examples of states 
 Here are examples of transitional states:
 
-SWHEELS_YAW_NEG_120_7 - When in **Yaw mode**, this state turns the wheels to their maximum turning position to change the angle relative to the wall without translational motion (around the middle of the platform). This states automatically returns to "YAW_DRIVE_READY_9" state after completion.
+SWHEELS_YAW_NEG_120_7 - When in **Yaw mode**, this state turns the wheels to their maximum turning position to change the angle relative to the wall without translational motion (turning around the middle of the platform). This states automatically returns to "YAW_DRIVE_READY_9" state after completion.
 
 SWHEELS_NEG_90_5 - When in **Simultaneous mode**, this states turns the wheels to 90 degrees position to change the distance from the target wall. This state automatically returns to "SWHEELS_SIMULT_DRIVE_READY_2" state after completion.
 
 SWHEELS_0_3 - This transitional state can be used on **Yaw mode** and **Simultaneous mode**  - to reset the wheels to their base (0 degrees) position quickly. After performing it's operation, this state transitions back to the previous state from which it was commanded. 
+# Steering:
+
+## Steering in Yaw Mode
+1. To switch to yaw mode, press "TRYB SKRĘTU -ODCHYŁ-" - (ROZP_WIER). 
+2. To steer left and right, use the L_JOY. 
+	2.1. To steer the wheels to **120 deg position**, hold the L_JOY to the left/right to the end position for 2 seconds.
+3. To drive forward slowly, tilt L_JOY forward.
+4. To drive forward faster, tilt R_JOY forward.
+
+## Steering in Simultaneous Mode
+1. To switch to Simultaneous mode, press "TRYB SKRĘTU -JEDNOCZESNY-" - (ROZS_PODP)
+2. To steer left and right, use the R_JOY. 
+	2.1. To steer the wheels to **90 deg position**, hold the R_JOY to the left/right to the end position for 2 seconds.
+3. To drive forward slowly, tilt L_JOY forward.
+4. To drive forward faster, tilt R_JOY forward.
+
+The image belowm shows a graphic of what the buttons do, and what the joystics are performing during usage.
+![Driving instructions on the remote](./assets/IREL_REMOTE_DRIVING.svg)
+
+### Restoring wheels to 0 deg position
+To restore the default position for **Yaw Mode or Simultaneous mode** tilt the L_JOY forward to the end position and hold it for 1 second.
+
+
 
 
 
