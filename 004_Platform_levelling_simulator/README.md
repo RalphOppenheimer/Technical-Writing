@@ -9,6 +9,7 @@ The program can be launched in internet browser and operated directly by the use
 After levelling, the final displacements reached after levelling are visible at the bottom right part of the UI.
 
 ### Usage
+In the UI view presented above:
 (1) - First thing to change is the angle at which the platform is tilted. 
 (2), (3) - coordinates of support point need to be defined for vertical actuators (V1 and V2).
 (4) - Pivot point coordinates specify which point of the platform should remain in place with respect to the ground during the levelling phase.
@@ -22,6 +23,6 @@ In the image, you can denote "ds" as a difference between the initial span of th
 Without the usage of horizontal actuators, this would directly translate to a torque load at the base of vertical actuators, which may cause damage.
 
 ### Application of the model
-This model was used to maintain the relative position of the laser detector used for establishing distance of plastering robot from the target wall. By applying this model to the plastering robot, it was possible keep the laser detector in given position after levelling.
+This model was used to maintain the relative position of the laser detector used for establishing distance of plastering robot from the target wall. By applying this model to the plastering robot, it was possible to keep the laser detector in given position after levelling.
 
 
