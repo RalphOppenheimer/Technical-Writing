@@ -25,4 +25,4 @@ Without the usage of horizontal actuators, this would directly translate to a to
 ### Application of the model
 This model was used to maintain the relative position of the laser detector used for establishing distance of plastering robot from the target wall. By applying this model to the plastering robot, it was possible to keep the laser detector in given position after levelling.
 
-
+Ciamek 
